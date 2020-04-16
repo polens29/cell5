@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useTracker } from 'meteor/react-meteor-data';
 import { PeopleCollection } from '/imports/api/people';
-import { List, Card, Modal } from 'antd';
+import { List, Card, Modal, Drawer } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { CelebrityView } from './CelebrityView';
 import moment from 'moment';
 
 
@@ -14,9 +15,16 @@ export const CelebrityList = () => {
 
   const [showDeleteModal, toggleModal] = useState(false);
   const [item, setItem] = useState(null);
+  const [showView, setShowView] = useState(false);
 
-  toggle = (item) => {
-  	toggleModal(!showDeleteModal);
+  toggle = (item, action) => {
+  	if(action == 'delete'){
+  		toggleModal(!showDeleteModal);
+  	}
+  	else if(action == 'view') {
+  		setShowView(!showView);
+  	}
+  	
   	setItem(item);
   }
 
@@ -38,7 +46,7 @@ export const CelebrityList = () => {
   	}
 
   	return (
-  		<Card>
+  		<Card onClick={() => toggle(item, 'view')}>
   			<div className='imgDiv'>
   				<img src={imageUrl} />
   			</div>
@@ -46,8 +54,8 @@ export const CelebrityList = () => {
   				<div className='name'>
   					<label>{item.firstName} {item.lastName}</label>
   					<div className='actions'>
-		  				<button><EditOutlined /></button>
-		  				<button onClick={() => toggle(item)}><DeleteOutlined /></button>
+		  				<button onClick={() => toggle(item, 'edit')}><EditOutlined /></button>
+		  				<button onClick={() => toggle(item, 'delete')}><DeleteOutlined /></button>
 		  			</div>
   				</div>
   				<label className='age'>{age}</label>
@@ -70,6 +78,19 @@ export const CelebrityList = () => {
 					</Modal>
 				)
 			}
+			{
+				item && (
+					<Drawer
+						title='Celebrity Details'
+						visible={showView}
+						onClose={() => toggle(null, 'view')}
+						width={510}
+					>
+						<CelebrityView item={item}/>
+					</Drawer>
+				)
+			}
+			
 			
 			<List
 		    grid={{

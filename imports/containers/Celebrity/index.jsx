@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Layout, Modal, Drawer } from 'antd';
 import { UserAddOutlined } from '@ant-design/icons';
 import { CelebrityWrapper, RedBtn } from './css';
-import CelebrityModal from './CelebrityModal';
 import CelebrityAdd from './CelebrityAdd';
 import { CelebrityList } from './CelebrityList';
 
