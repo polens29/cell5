@@ -1,0 +1,25 @@
+body {
+  padding: 0px;
+  margin: 0px;
+  font-family: 'Raleway', sans-serif;
+}
+
+.ant-drawer-header {
+	background-color: #DD3728;
+	height: 65px;
+	padding: 20px;
+}
+
+.ant-drawer-body {
+	overflow-x: hidden;
+}
+
+.ant-drawer-title {
+	color: white;
+	font-weight: 600;
+	padding-top: 2px;
+}
+
+.ant-drawer-close {
+	color: white;
+}
