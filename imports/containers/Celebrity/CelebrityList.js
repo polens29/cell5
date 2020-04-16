@@ -13,15 +13,15 @@ export const CelebrityList = () => {
   });
 
   const [showDeleteModal, toggleModal] = useState(false);
-  const [id, setID] = useState(null);
+  const [item, setItem] = useState(null);
 
-  toggle = (id) => {
+  toggle = (item) => {
   	toggleModal(!showDeleteModal);
-  	setID(id);
+  	setItem(item);
   }
 
   deleteCelebrity = () => {
-  	PeopleCollection.remove(id)
+  	PeopleCollection.remove(item._id)
   	toggleModal(!showDeleteModal);
   }
 
@@ -47,7 +47,7 @@ export const CelebrityList = () => {
   					<label>{item.firstName} {item.lastName}</label>
   					<div className='actions'>
 		  				<button><EditOutlined /></button>
-		  				<button onClick={() => toggle(item._id)}><DeleteOutlined /></button>
+		  				<button onClick={() => toggle(item)}><DeleteOutlined /></button>
 		  			</div>
   				</div>
   				<label className='age'>{age}</label>
@@ -59,13 +59,18 @@ export const CelebrityList = () => {
 
 	return (
 		<div>
-			<Modal
-				visible={showDeleteModal}
-				onCancel={() => toggle(null)}
-				onOk={deleteCelebrity}
-			>
-				test
-			</Modal>
+			{
+				item && (
+					<Modal
+						visible={showDeleteModal}
+						onCancel={() => toggle(null)}
+						onOk={deleteCelebrity}
+					>
+						Are you sure you want to delete {item.firstName} {item.lastName}?
+					</Modal>
+				)
+			}
+			
 			<List
 		    grid={{
 		      gutter: [32, 24],

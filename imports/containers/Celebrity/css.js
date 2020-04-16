@@ -74,7 +74,7 @@ export const CelebrityWrapper = styled(Layout)`
 					label {
 						font-size: 15px;
 						font-weight: 600;	
-						width: 78%;
+						width: 75%;
 					}
 					
 					.actions {
