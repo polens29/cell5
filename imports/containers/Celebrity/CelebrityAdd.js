@@ -1,5 +1,5 @@
 import React from 'react';
-import { Upload, message, DatePicker, Select, notification } from 'antd';
+import { Upload, message, DatePicker, Select, notification, Drawer} from 'antd';
 import { LoadingOutlined, PlusOutlined } from '@ant-design/icons';
 import { AddWrapper, RedBtn, CancelBtn } from './css'
 import moment from 'moment';
@@ -26,21 +26,46 @@ function beforeUpload(file) {
 }
 
 export default class CelebrityAdd extends React.Component {
-  state = {
-    loading: false,
-    firstName: '',
-    lastName: '',
-    gender: 'N/A',
-    bio: ''
-  };
 
   constructor(props){
   	super(props);
+
+  	this.state = {
+	    loading: false,
+	    firstName: '',
+	    lastName: '',
+	    gender: 'N/A',
+	    bio: '',
+	    tags: []
+	  };
+
+  }
+
+  componentDidMount(){
+  	if(this.props.item){
+  		this.setState({
+  			...this.props.item
+  		})
+  	}
+  }
+
+  setInitialState = () => {
+  	this.setState({
+  		loading: false,
+	    firstName: '',
+	    lastName: '',
+	    gender: 'N/A',
+	    bio: '',
+	    tags: []
+  	})
   }
 
   handleChange = info => {
     if (info.file.status === 'uploading') {
-      this.setState({ loading: true });
+      this.setState({
+      	imageUrl: null,
+      	loading: true
+      });
       return;
     }
     if (info.file.status === 'done') {
@@ -57,6 +82,9 @@ export default class CelebrityAdd extends React.Component {
   handleInputChange = (field, value) => {
   	if(field === 'dob'){
   		value = value.format('YYYY-MM-DD');
+  	}
+  	else if(field != 'tags'){
+  		value = value.charAt(0).toUpperCase() + value.slice(1)
   	}
   	this.setState({
   		[field]: value
@@ -87,115 +115,189 @@ export default class CelebrityAdd extends React.Component {
   	}
   }
 
+  handleUpdate = () => {
+  	let payload = this.state;
+  	let item = this.props.item;
+  	delete payload['loading'];
+  	try {
+
+  		let person = PeopleCollection.update(
+  			item._id,
+  			{
+	  			$set: {
+	  				...payload
+	  			}
+	  		}
+	  	);	
+	  	notification.success({
+		    message: 'Successfully edited details.',
+		  });
+		  this.props.toggle(this.props.item, 'edit')
+
+  	} catch(error) {
+  		notification.error({
+  			message: 'Something went wrong. Please try again.'
+  		})
+  	}
+  }
+
+  onClose = () => {
+  	if(this.props.item) {
+  		this.props.toggle(this.props.item, 'edit')
+  	}
+  	else {
+  		this.setInitialState();
+  		this.props.toggle();
+  	}
+  }
+
   render() {
+    const { imageUrl, firstName, lastName, gender, bio, dob, tags, loading } = this.state;
+
     const uploadButton = (
       <div>
-        {this.state.loading ? <LoadingOutlined /> : <PlusOutlined />}
-        <div className="ant-upload-text">Upload Profile Picture</div>
+        {loading ? <LoadingOutlined /> : <PlusOutlined />}
+        <div className="ant-upload-text">
+        	{loading ? 'Uploading' : 'Upload Profile Picture'}
+        </div>
       </div>
     );
-    const { imageUrl, firstName, lastName } = this.state;
+
     let disableBtn = false;
-    if(firstName == '' || lastName == ''){
+    if(firstName == '' || lastName == '' || loading){
     	disableBtn = true;
     }
 
     return (
-    	<AddWrapper>
-	    	<div className='upload-div'>
-		      <Upload
-		        name="avatar"
-		        listType="picture-card"
-		        className="avatar-uploader"
-		        showUploadList={false}
-		        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
-		        beforeUpload={beforeUpload}
-		        onChange={this.handleChange}
-		      >
-		        {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
-		      </Upload>
-		    </div>
-		    <div className='fields'>
-		    	<div className='labels'>
-		    		<div>First Name</div>
-		    		<div>Last Name</div>
-		    	</div>
-		    	<div className='input-fields'>
-		    		<input
-		    			type='text'
-		    			placeholder='First Name'
-		    			className='inpt'
-		    			onChange={(e) => this.handleInputChange('firstName', e.target.value)}
-		    		/>
-		    		<input
-		    			type='text'
-		    			placeholder='Last Name'
-		    			className='inpt'
-		    			onChange={(e) => this.handleInputChange('lastName', e.target.value)}
-		    		/>
-		    	</div>
+    	<Drawer
+        title={this.props.title}
+        visible={this.props.showModal}
+        onClose={this.onClose}
+        width={510}
+        placement='right'
+      >
+	    	<AddWrapper>
+		    	<div className='upload-div'>
+			      <Upload
+			        name="avatar"
+			        listType="picture-card"
+			        className="avatar-uploader"
+			        showUploadList={false}
+			        action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+			        beforeUpload={beforeUpload}
+			        onChange={this.handleChange}
+			      >
+			        {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton}
+			      </Upload>
+			    </div>
+			    <div className='fields'>
+			    	<div className='labels'>
+			    		<div>First Name</div>
+			    		<div>Last Name</div>
+			    	</div>
+			    	<div className='input-fields'>
+			    		<input
+			    			type='text'
+			    			placeholder='First Name'
+			    			className='inpt'
+			    			value={firstName}
+			    			onChange={(e) => this.handleInputChange('firstName', e.target.value)}
+			    		/>
+			    		<input
+			    			type='text'
+			    			placeholder='Last Name'
+			    			className='inpt'
+			    			value={lastName}
+			    			onChange={(e) => this.handleInputChange('lastName', e.target.value)}
+			    		/>
+			    	</div>
 
-		    	<div className='labels'>
-		    		<div>Gender</div>
-		    		<div>Date of Birth</div>
-		    	</div>
-		    	<div className='input-fields'>
-		    		<Select
-		    			placeholder='Gender'
-		    			onChange={(e) => this.handleInputChange('gender', e)}
-		    		>
-				      <Option value="female">Female</Option>
-				      <Option value="male">Male</Option>
-				      <Option value="other">Other</Option>
-		    		</Select>
+			    	<div className='labels'>
+			    		<div>Gender</div>
+			    		<div>Date of Birth</div>
+			    	</div>
+			    	<div className='input-fields'>
+			    		<Select
+			    			placeholder='Gender'
+			    			onChange={(e) => this.handleInputChange('gender', e)}
+			    			value={gender}
+			    		>
+					      <Option value="female">Female</Option>
+					      <Option value="male">Male</Option>
+					      <Option value="other">Other</Option>
+			    		</Select>
 
-		    		<DatePicker
-		    			placeholder='Date of Birth'
-		    			format='MMM D, YYYY'
-		    			onChange={(e) => this.handleInputChange('dob', e)}
-		    			disabledDate={this.disabledDate}
-		    		/>
-		    	</div>
+			    		<DatePicker
+			    			placeholder='Date of Birth'
+			    			format='MMM D, YYYY'
+			    			onChange={(e) => this.handleInputChange('dob', e)}
+			    			disabledDate={this.disabledDate}
+			    			defaultValue={moment(dob)}
+			    		/>
+			    	</div>
 
-		    	<div className='labels'>
-		    		<div>Biography</div>
-		    	</div>
-		    	<div className='input-fields'>
-		    		<textarea
-		    			placeholder='Biography'
-		    			onChange={(e) => this.handleInputChange('bio', e.target.value)}
-		    		/>
-		    	</div>
+			    	<div className='labels'>
+			    		<div>Biography</div>
+			    	</div>
+			    	<div className='input-fields'>
+			    		<textarea
+			    			placeholder='Biography'
+			    			onChange={(e) => this.handleInputChange('bio', e.target.value)}
+			    			value={bio}
+			    		/>
+			    	</div>
 
-		    	<div className='labels'>
-		    		<div>Twitter Hashtags</div>
-		    	</div>
-		    	<div className='input-fields'>
-		    		<Select
-		    		 	mode="tags"
-		    		 	placeholder="Twitter Hashtags"
-		    		 	notFoundContent='Type to add tag'
-		    		 	className='tags'
-		    		 	onChange={(e) => this.handleInputChange('tags', e)}
-		    		/>
-		    	</div>
-		    	<div className='drawer-btns'>
-		    		<RedBtn
-		    			float='none'
-		    			width='100px'
-		    			onClick={this.handleSubmit}
-		    			disabled={disableBtn}
-		    		>
-		    			Add
-		    		</RedBtn>
-		    		<CancelBtn
-		    			onClick={this.props.toggle}
-		    		>
-		    			Cancel
-		    		</CancelBtn>
-		    	</div>
-		    </div>
-		  </AddWrapper>
+			    	<div className='labels'>
+			    		<div>Twitter Hashtags</div>
+			    	</div>
+			    	<div className='input-fields'>
+			    		<Select
+			    		 	mode="tags"
+			    		 	placeholder="Twitter Hashtags"
+			    		 	notFoundContent='Type to add tag'
+			    		 	className='tags'
+			    		 	onChange={(e) => this.handleInputChange('tags', e)}
+			    		 	value={tags}
+			    		/>
+			    	</div>
+			    	{
+			    		this.props.item ?
+			    		<div className='drawer-btns'>
+				    		<RedBtn
+				    			float='none'
+				    			width='100px'
+				    			onClick={this.handleUpdate}
+				    			disabled={disableBtn}
+				    		>
+				    			Update
+				    		</RedBtn>
+				    		<CancelBtn
+				    			onClick={() => this.props.toggle(this.props.item, 'edit')}
+				    		>
+				    			Cancel
+				    		</CancelBtn>
+				    	</div>
+				    	:
+				    	<div className='drawer-btns'>
+				    		<RedBtn
+				    			float='none'
+				    			width='100px'
+				    			onClick={this.handleSubmit}
+				    			disabled={disableBtn}
+				    		>
+				    			Add
+				    		</RedBtn>
+				    		<CancelBtn
+				    			onClick={this.props.toggle}
+				    		>
+				    			Cancel
+				    		</CancelBtn>
+				    	</div>
+			    	}
+			    	
+			    </div>
+			  </AddWrapper>
+			</Drawer>
     );
   }
 }

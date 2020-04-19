@@ -1,21 +1,16 @@
 import React, { useState } from 'react';
-import { useTracker } from 'meteor/react-meteor-data';
-import { PeopleCollection } from '/imports/api/people';
 import { List, Card, Modal, Drawer } from 'antd';
 import { EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import CelebrityAdd from './CelebrityAdd';
 import { CelebrityView } from './CelebrityView';
 import moment from 'moment';
 
+export const CelebrityList = (props) => {
 
-export const CelebrityList = () => {
-
-	const people = useTracker(() => {
-    return PeopleCollection.find().fetch();
-  });
-
+  const [showView, setShowView] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
   const [showDeleteModal, toggleModal] = useState(false);
   const [item, setItem] = useState(null);
-  const [showView, setShowView] = useState(false);
 
   toggle = (item, action) => {
   	if(action == 'delete'){
@@ -23,6 +18,11 @@ export const CelebrityList = () => {
   	}
   	else if(action == 'view') {
   		setShowView(!showView);
+  	}
+  	else if(action == 'edit') {
+  		setShowEdit(!showEdit);
+  		setShowView(!showView);
+  		item = props.getUpdatedDetails(item);
   	}
   	
   	setItem(item);
@@ -53,10 +53,6 @@ export const CelebrityList = () => {
   			<div className='content'>
   				<div className='name'>
   					<label>{item.firstName} {item.lastName}</label>
-  					<div className='actions'>
-		  				<button onClick={() => toggle(item, 'edit')}><EditOutlined /></button>
-		  				<button onClick={() => toggle(item, 'delete')}><DeleteOutlined /></button>
-		  			</div>
   				</div>
   				<label className='age'>{age}</label>
   				<div className='bio'>{item.bio}</div>
@@ -65,13 +61,22 @@ export const CelebrityList = () => {
   	)
   }
 
+  let list = props.people;
+  list.sort(function(a,b){
+  	if(props.orderBy == 'desc') {
+  		return(b[props.sortBy].localeCompare(a[props.sortBy]))
+  	}
+
+  	return(a[props.sortBy].localeCompare(b[props.sortBy]))
+  });
+
 	return (
 		<div>
 			{
 				item && (
 					<Modal
 						visible={showDeleteModal}
-						onCancel={() => toggle(null)}
+						onCancel={() => toggle(item, 'delete')}
 						onOk={deleteCelebrity}
 					>
 						Are you sure you want to delete {item.firstName} {item.lastName}?
@@ -82,15 +87,33 @@ export const CelebrityList = () => {
 				item && (
 					<Drawer
 						title='Celebrity Details'
-						visible={showView}
+						visible={showView || showEdit}
 						onClose={() => toggle(null, 'view')}
 						width={510}
 					>
-						<CelebrityView item={item}/>
+						{
+							showView && (
+								<CelebrityView
+									item={item}
+									toggle={toggle}
+									{...props}
+								/>
+							)
+						}
 					</Drawer>
 				)
 			}
-			
+
+			{
+				showEdit && (
+					<CelebrityAdd
+						item={item}
+						toggle={toggle}
+						showModal={showEdit}
+						title='Update Celebrity Details'
+					/>
+				)
+			}
 			
 			<List
 		    grid={{
@@ -102,7 +125,7 @@ export const CelebrityList = () => {
 		      xl: 6,
 		      xxl: 6,
 		    }}
-		    dataSource={people}
+		    dataSource={props.people}
 		    renderItem={item => (
 		      <List.Item>
 		        {this.renderCard(item)}

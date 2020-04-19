@@ -23,3 +23,7 @@ body {
 .ant-drawer-close {
 	color: white;
 }
+
+.ant-drawer-close:hover {
+	color: white;
+}
