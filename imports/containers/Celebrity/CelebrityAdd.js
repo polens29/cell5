@@ -36,7 +36,8 @@ export default class CelebrityAdd extends React.Component {
 	    lastName: '',
 	    gender: 'N/A',
 	    bio: '',
-	    tags: []
+	    tags: [],
+	    showError: false
 	  };
 
   }
@@ -86,9 +87,17 @@ export default class CelebrityAdd extends React.Component {
   	else if(field != 'tags'){
   		value = value.charAt(0).toUpperCase() + value.slice(1)
   	}
-  	this.setState({
-  		[field]: value
-  	})
+
+  	if(this.state.showError){
+  		notification.error({
+  			message: 'Please remove # sign'
+  		})
+  	}
+  	else {
+  		this.setState({
+	  		[field]: value
+	  	})
+  	}
   }
 
   disabledDate = (current) => {
@@ -151,8 +160,21 @@ export default class CelebrityAdd extends React.Component {
   	}
   }
 
+  handleKeyDown = (e) => {
+  	let value = e.target.value;
+		if(value.includes('#')){
+			notification.error({
+  			message: 'Please remove # sign'
+  		})
+		}
+
+		this.setState({
+			showError: value.includes('#')
+		})
+  }
+
   render() {
-    const { imageUrl, firstName, lastName, gender, bio, dob, tags, loading } = this.state;
+    const { imageUrl, firstName, lastName, gender, bio, dob, tags, loading, showError } = this.state;
 
     const uploadButton = (
       <div>
@@ -258,6 +280,7 @@ export default class CelebrityAdd extends React.Component {
 			    		 	className='tags'
 			    		 	onChange={(e) => this.handleInputChange('tags', e)}
 			    		 	value={tags}
+			    		 	onInputKeyDown={this.handleKeyDown}
 			    		/>
 			    	</div>
 			    	{

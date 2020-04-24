@@ -38,6 +38,17 @@ export const CancelBtn = styled.button`
 export const ViewWrapper = styled.div`
 	display: grid;
 
+	.tweets {
+		width: 350px;
+		margin: auto;
+	}
+
+	.back-btn {
+		color: ${BlueBtn};
+		cursor: pointer;
+		margin-right: 20px;
+	}
+
 	.actions {
     right: 0;
     margin-bottom: 20px;
@@ -225,7 +236,7 @@ export const CelebrityWrapper = styled(Layout)`
 				  white-space: nowrap;
 				  overflow: hidden;
 				  text-overflow: ellipsis;
-				
+					height: 20px;
 				}
 			}
 		}

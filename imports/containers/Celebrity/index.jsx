@@ -55,21 +55,6 @@ export const CelebrityContainer = () => {
 				<div className='add-div'>
 					<label>List of Famous People</label>
 					<div className='right'>
-						<div className='sort'>
-							<label>Sort By:</label>
-							<Select defaultValue={sortBy} onChange={(value) => setSortBy(value)}>
-								<Option value='lastName'>Last Name</Option>
-								<Option value='firstName'>First Name</Option>
-							</Select>
-							<SortDescendingOutlined
-								onClick={() => setOrderBy('desc')}
-								className={orderBy=='desc'?'active order':'order'}
-							/>
-							<SortAscendingOutlined
-								onClick={() => setOrderBy('asc')}
-								className={orderBy=='asc'?'active order':'order'}
-							/>
-						</div>
 						<div className='search borderBlue'>
 							<input
 								type='text'

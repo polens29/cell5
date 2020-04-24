@@ -19,17 +19,6 @@ export const App = () => {
 		<LayoutWrapper>
 	  	<Header>
 	  		<img src='https://i.imgur.com/a9Dxo6e.png' />
-	  		{/*
-	  		<Menu
-	  			theme="dark"
-	  			mode="horizontal"
-	  			defaultSelectedKeys={nav}
-	  			onClick={navigation}
-	  		>
-		      <Menu.Item key="/">Celebrities</Menu.Item>
-		      <Menu.Item key="/twitter">Twitter Feed</Menu.Item>
-		    </Menu>
-		   	*/}
 	  	</Header>
 	  	<Content className='main-content'>
 	  		<Router>

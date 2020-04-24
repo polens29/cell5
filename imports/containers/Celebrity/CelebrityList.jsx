@@ -4,6 +4,8 @@ import { EyeOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import CelebrityAdd from './CelebrityAdd';
 import { CelebrityView } from './CelebrityView';
 import moment from 'moment';
+import { PeopleCollection } from '/imports/api/people';
+
 
 export const CelebrityList = (props) => {
 
@@ -31,6 +33,7 @@ export const CelebrityList = (props) => {
   deleteCelebrity = () => {
   	PeopleCollection.remove(item._id)
   	toggleModal(!showDeleteModal);
+  	setShowView(false);
   }
 
   renderCard = (item) => {
@@ -52,7 +55,7 @@ export const CelebrityList = (props) => {
   			</div>
   			<div className='content'>
   				<div className='name'>
-  					<label>{item.firstName} {item.lastName}</label>
+  					<label>{item.lastName}, {item.firstName} </label>
   				</div>
   				<label className='age'>{age}</label>
   				<div className='bio'>{item.bio}</div>
@@ -62,13 +65,14 @@ export const CelebrityList = (props) => {
   }
 
   let list = props.people;
-  list.sort(function(a,b){
-  	if(props.orderBy == 'desc') {
-  		return(b[props.sortBy].localeCompare(a[props.sortBy]))
-  	}
+  list.sort(function (x, y) {
+    var n = x.lastName.localeCompare(y.lastName);
+    if (n !== 0) {
+        return n;
+    }
 
-  	return(a[props.sortBy].localeCompare(b[props.sortBy]))
-  });
+    return x.firstName.localeCompare(y.firstName);
+	});
 
 	return (
 		<div>
